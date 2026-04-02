@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MVP 스테이지 · 산출물 요구사항</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --border: #E0DAD0;
+    --border-strong: #C8C0B0;
+    --text-primary: #1A1714;
+    --text-secondary: #5A534A;
+    --text-tertiary: #9A9080;
+    --amber: #C8860A;
+    --amber-bg: #FDF3DC;
+    --amber-border: #F0C060;
+    --teal: #0A7A5A;
+    --teal-bg: #E0F5EC;
+    --teal-border: #6ACCA8;
+    --purple: #5040B0;
+    --purple-bg: #EEEAFC;
+    --purple-border: #A090E0;
+    --red: #B02020;
+    --red-bg: #FCEAEA;
+    --red-border: #E08080;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.7;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* 헤더 */
+  .header {
+    background: var(--text-primary);
+    color: #F7F5F0;
+    padding: 48px 0 40px;
+  }
+  .header-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+  .header-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: #9A9080;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .header-title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .header-sub {
+    font-size: 14px;
+    color: #9A9080;
+    font-weight: 300;
+  }
+
+  /* 흐름 바 */
+  .flow-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .flow-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .flow-inner::-webkit-scrollbar { display: none; }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px 14px 0;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    transition: color 0.2s;
+    flex-shrink: 0;
+  }
+  .flow-step:hover { color: var(--text-primary); }
+  .flow-step .num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .flow-step.s1 .num { background: var(--purple-bg); color: var(--purple); }
+  .flow-step.s2 .num { background: var(--amber-bg); color: var(--amber); }
+  .flow-step.s3 .num { background: var(--teal-bg); color: var(--teal); }
+  .flow-arrow { color: var(--border-strong); font-size: 14px; margin: 0 4px; flex-shrink: 0; }
+
+  /* 메인 */
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 48px 40px 80px;
+  }
+
+  /* 제출물 섹션 */
+  .submit-section {
+    margin-bottom: 56px;
+  }
+  .submit-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--text-primary);
+  }
+  .submit-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+  .num-purple { background: var(--purple-bg); color: var(--purple); }
+  .num-amber  { background: var(--amber-bg);  color: var(--amber);  }
+  .num-teal   { background: var(--teal-bg);   color: var(--teal);   }
+  .submit-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  /* PRD 블록 */
+  .prd-block {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    background: var(--surface);
+  }
+  .prd-block-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .block-idx {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .idx-amber { background: var(--amber-bg); color: var(--amber); }
+  .idx-teal  { background: var(--teal-bg);  color: var(--teal);  }
+  .block-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .block-link {
+    margin-left: auto;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    color: var(--text-tertiary);
+    white-space: nowrap;
+  }
+  .block-link.teal { border-color: var(--teal-border); color: var(--teal); }
+
+  .prd-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+
+  .req-row { display: flex; gap: 10px; align-items: flex-start; }
+  .req-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    margin-top: 8px; flex-shrink: 0;
+  }
+  .dot-amber { background: var(--amber); }
+  .dot-teal  { background: var(--teal); }
+  .req-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  .req-text strong { color: var(--text-primary); font-weight: 700; }
+
+  .example {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    line-height: 1.65;
+    margin-top: 2px;
+  }
+  .example span { color: var(--text-secondary); }
+
+
+  .validation {
+    padding: 10px 20px;
+    font-size: 12px;
+    line-height: 1.55;
+    border-top: 1px solid var(--border);
+  }
+  .val-amber { background: var(--amber-bg); color: #7A5000; }
+  .val-teal  { background: var(--teal-bg);  color: #0A5040; }
+
+  /* 랜딩 / MVP 요건 카드 */
+  .req-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    margin-bottom: 10px;
+  }
+  .req-card-head {
+    padding: 11px 20px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .req-card-body { padding: 14px 20px; display: flex; flex-direction: column; gap: 9px; }
+
+  /* 형식 그리드 */
+  .format-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .format-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: var(--surface);
+  }
+  .format-title { font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+  .format-body { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* 탈락 기준 */
+  .caution {
+    border-left: 3px solid var(--red);
+    background: var(--red-bg);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--red);
+    line-height: 1.65;
+  }
+  .caution strong { font-weight: 700; display: block; margin-bottom: 4px; }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* 섹션 라벨 */
+  .sec-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+  }
+  .sec-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+
+  @media (max-width: 600px) {
+    .header-inner, main { padding-left: 20px; padding-right: 20px; }
+    .flow-bar { padding: 0 20px; }
+    .format-grid { grid-template-columns: 1fr; }
+    .data-visual { flex-direction: column; }
+    .header-title { font-size: 22px; }
+  }
+
+  /* ── PRD 샘플 스타일 추가 ── */
+  .prd-doc { background: #FFFFFF; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+  .doc-header { padding: 28px 40px 24px; border-bottom: 2px solid var(--text-primary); display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; }
+  .doc-service { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500; color: var(--amber); letter-spacing: 0.06em; margin-bottom: 4px; }
+  .doc-title { font-size: 18px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.01em; margin-bottom: 10px; }
+  .doc-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .meta-item { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-tertiary); }
+  .meta-item strong { color: var(--text-secondary); }
+  .doc-badge { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: 8px; padding: 10px 16px; text-align: center; flex-shrink: 0; }
+  .doc-badge-num { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.1em; display: block; margin-bottom: 2px; }
+  .doc-badge-label { font-size: 12px; font-weight: 700; color: var(--amber); }
+  .purpose-banner { padding: 16px 40px; background: var(--amber-bg); border-bottom: 1px solid var(--amber-border); display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .purpose-item { padding: 0 20px; border-right: 1px solid var(--amber-border); }
+  .purpose-item:first-child { padding-left: 0; }
+  .purpose-item:last-child { border-right: none; }
+  .purpose-role { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .purpose-desc { font-size: 12px; color: #7A5000; line-height: 1.5; }
+  .prd-block-new { border-bottom: 1px solid var(--border); }
+  .prd-block-new:last-child { border-bottom: none; }
+  .block-head { display: flex; align-items: center; gap: 10px; padding: 13px 40px; background: #FAFAF8; border-bottom: 1px solid var(--border); }
+  .block-num { width: 24px; height: 24px; border-radius: 50%; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .num-amber-new { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .num-teal-new  { background: var(--teal-bg);  color: var(--teal);  border: 1px solid var(--teal-border); }
+  .num-blue-new  { background: var(--blue-bg);  color: var(--blue);  border: 1px solid var(--blue-bd); }
+  .block-title-new { font-size: 13px; font-weight: 700; color: var(--text-primary); flex: 1; }
+  .block-subtitle-new { font-size: 12px; color: var(--text-tertiary); margin-left: 4px; }
+  .block-tag-new { font-size: 10px; font-family: 'DM Mono', monospace; padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+  .tag-amber-new { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .tag-teal-new  { background: var(--teal-bg);  color: var(--teal);  border: 1px solid var(--teal-border); }
+  .block-body-new { padding: 24px 40px; display: flex; flex-direction: column; gap: 22px; }
+  .sub-label { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .it { display: inline-block; font-size: 10px; font-family: 'DM Mono', monospace; padding: 1px 6px; border-radius: 3px; margin: 1px 3px 1px 0; vertical-align: middle; }
+  .it-amber-new  { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
+  .it-teal-new   { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-border); }
+  .it-gray-new   { background: #F0EDE8; color: var(--text-tertiary); border: 1px solid var(--border-strong); }
+  .it-blue-new   { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-bd); }
+  .it-red-new    { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+  .it-purple-new { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+  /* 유저 플로우 */
+  .flow-diagram { overflow-x: auto; padding-bottom: 8px; }
+  .flow-track { display: flex; align-items: flex-start; gap: 0; min-width: max-content; }
+  .flow-step { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .flow-box { border: 1.5px solid var(--border-strong); border-radius: 8px; padding: 10px 14px; min-width: 100px; max-width: 120px; text-align: center; background: #FFFFFF; }
+  .flow-box.active  { border-color: var(--teal-border); background: var(--teal-bg); }
+  .flow-box.master  { border-color: var(--amber-border); background: var(--amber-bg); }
+  .flow-box.branch  { border-color: var(--blue-bd); background: var(--blue-bg); }
+  .flow-box-title { font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+  .flow-box.active  .flow-box-title { color: var(--teal); }
+  .flow-box.master  .flow-box-title { color: var(--amber); }
+  .flow-box.branch  .flow-box-title { color: var(--blue); }
+  .flow-box-sub { font-size: 10px; color: var(--text-tertiary); font-family: 'DM Mono', monospace; line-height: 1.4; }
+  .flow-conn { display: flex; align-items: center; padding: 0 4px; margin-top: 20px; color: var(--text-tertiary); font-size: 14px; flex-shrink: 0; }
+  .flow-cond { font-size: 9px; font-family: 'DM Mono', monospace; color: var(--blue); background: var(--blue-bg); border: 1px solid var(--blue-bd); padding: 2px 6px; border-radius: 3px; margin-top: 6px; white-space: nowrap; }
+  /* 화면 목록 테이블 */
+  .screen-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .screen-table th { background: #F0EDE8; padding: 7px 14px; text-align: left; font-weight: 700; font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); border-bottom: 1px solid var(--border-strong); }
+  .screen-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text-secondary); line-height: 1.5; vertical-align: top; }
+  .screen-table tr:last-child td { border-bottom: none; }
+  .screen-table tr:hover td { background: #FAFAF8; }
+  .screen-table td:first-child { white-space: nowrap; }
+  .screen-table td:nth-child(2) { font-weight: 500; color: var(--text-primary); }
+  .screen-who { font-size: 10px; font-family: 'DM Mono', monospace; }
+  /* In/Out */
+  .inout-grid-new { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .inout-box { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .inout-head-new { padding: 7px 14px; font-size: 11px; font-weight: 700; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--border); }
+  .in-head-new  { background: var(--teal-bg);  color: var(--teal); }
+  .out-head-new { background: #F5F0E8; color: var(--text-tertiary); }
+  .inout-body-new { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
+  .inout-item-new { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .in-dot  { color: var(--teal); font-size: 10px; margin-top: 3px; flex-shrink: 0; }
+  .out-dot { color: var(--text-tertiary); font-size: 10px; margin-top: 3px; flex-shrink: 0; }
+  .inout-reason { font-size: 10px; color: var(--text-tertiary); font-family: 'DM Mono', monospace; margin-left: 16px; }
+  /* 가정 카드 */
+  .assumption-card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+  .assumption-card:last-child { margin-bottom: 0; }
+  .assumption-head-new { display: flex; align-items: center; gap: 10px; padding: 9px 16px; border-bottom: 1px solid var(--border); }
+  .ah-biz  { background: var(--amber-bg); }
+  .ah-tech { background: var(--purple-bg); }
+  .assumption-num { width: 20px; height: 20px; border-radius: 50%; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .an-biz  { background: var(--amber); color: white; }
+  .an-tech { background: var(--purple); color: white; }
+  .assumption-title { font-size: 12px; font-weight: 700; color: var(--text-primary); flex: 1; }
+  .assumption-type { font-size: 10px; font-family: 'DM Mono', monospace; }
+  .assumption-body-new { padding: 12px 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .abox-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .abox-val { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+  .abox-val strong { color: var(--text-primary); font-weight: 500; }
+  /* 검증 바 */
+  .val-bar { padding: 10px 40px; font-size: 12px; line-height: 1.5; border-top: 1px solid var(--border); }
+  .val-amber-new { background: var(--amber-bg); color: #7A5000; }
+  .val-teal-new  { background: var(--teal-bg);  color: #0A4A3A; }
+  /* 문서 푸터 */
+  .doc-footer { padding: 14px 40px; border-top: 2px solid var(--text-primary); background: #FAFAF8; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .footer-left { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-tertiary); }
+  .footer-left strong { color: var(--amber); }
+
+  @media (max-width: 680px) {
+    .doc-header, .purpose-banner { grid-template-columns: 1fr; }
+    .purpose-item { padding: 8px 0; border-right: none; border-bottom: 1px solid var(--amber-border); }
+    .purpose-item:last-child { border-bottom: none; }
+    .block-head, .block-body-new, .val-bar, .doc-footer { padding-left: 20px; padding-right: 20px; }
+    .inout-grid-new { grid-template-columns: 1fr; }
+    .assumption-body-new { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-eyebrow">AI 솔로프러너 육성 프로그램 · Stage 2(사전교육)</div>
+    <h1 class="header-title">MVP 스테이지<br>산출물 요구사항</h1>
+    <p class="header-sub">창업방법론(고객 → 문제 → 솔루션)이 반영된 MVP를 만들기 위한 3가지 제출물 기준</p>
+  </div>
+</header>
+
+<nav class="flow-bar">
+  <div class="flow-inner">
+    <a href="#landing" class="flow-step s1">
+      <span class="num">1</span> 랜딩페이지
+    </a>
+    <span class="flow-arrow">→</span>
+    <a href="#prd" class="flow-step s2">
+      <span class="num">2</span> PRD 1페이지
+    </a>
+    <span class="flow-arrow">→</span>
+    <a href="#mvp" class="flow-step s3">
+      <span class="num">3</span> MVP URL
+    </a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ── 제출물 1: 랜딩페이지 ── -->
+  <section class="submit-section" id="landing">
+    <div class="submit-header">
+      <span class="submit-num num-purple">제출물 1</span>
+      <h2 class="submit-title">서비스 소개 랜딩페이지</h2>
+    </div>
+
+    <div class="req-card">
+      <div class="req-card-head">① 고객과 문제 정의 — 누구의, 어떤 문제인가</div>
+      <div class="req-card-body">
+        <div class="req-row">
+          <span class="req-dot dot-amber"></span>
+          <span class="req-text"><strong>타깃 고객 페르소나</strong> — 직업·상황·행동 패턴이 1~2문장으로 명확히 서술돼야 함</span>
+        </div>
+        <div class="req-row">
+          <span class="req-dot dot-amber"></span>
+          <span class="req-text"><strong>핵심 불편 상황 (Pain Scene)</strong> — "언제, 무엇 때문에 힘든가"를 구체적 시나리오로 서술 (숫자·빈도·감정 포함)</span>
+        </div>
+        <div class="req-row">
+          <span class="req-dot dot-amber"></span>
+          <span class="req-text"><strong>기존 대안의 한계</strong> — 고객이 지금 어떻게 해결하고 있고, 왜 그게 불충분한지 1~2줄</span>
+        </div>
+        <div class="example">검증 기준 — <span>"고객이 직접 한 말처럼 읽히는가?" 추상적인 니즈 나열이 아닌, 특정 상황의 실제 불편함이 담겨야 합니다.</span></div>
+      </div>
+    </div>
+
+    <div class="req-card">
+      <div class="req-card-head">② 솔루션과 가치 — 어떻게 해결하고, 고객에게 무엇이 달라지는가</div>
+      <div class="req-card-body">
+        <div class="req-row">
+          <span class="req-dot dot-amber"></span>
+          <span class="req-text"><strong>핵심 기능 2~3개</strong> — 기능 나열이 아닌, 각 기능이 위에서 정의한 어떤 Pain을 해결하는지 연결해서 서술</span>
+        </div>
+        <div class="req-row">
+          <span class="req-dot dot-amber"></span>
+          <span class="req-text"><strong>Before / After 고객 경험</strong> — 솔루션 사용 전·후 고객의 상황이 어떻게 달라지는지 대비 구조로 표현</span>
+        </div>
+        <div class="req-row">
+          <span class="req-dot dot-amber"></span>
+          <span class="req-text"><strong>핵심 가치 문장 1개</strong> — "누구를 위한, 무엇을 하는, 왜 다른" 구조의 한 문장 포지셔닝</span>
+        </div>
+        <div class="example">검증 기준 — <span>기능 설명과 Pain 정의가 1:1로 연결되는가? "좋은 기능"이 아니라 "이 고객의 이 문제를 푸는 기능"으로 읽혀야 합니다.</span></div>
+      </div>
+    </div>
+
+    <div class="req-card">
+      <div class="req-card-head">③ 신뢰 요소 — 실제로 만들고 검증했다는 근거</div>
+      <div class="req-card-body">
+        <div class="req-row">
+          <span class="req-dot dot-amber"></span>
+          <span class="req-text"><strong>MVP 링크 삽입</strong> — 랜딩페이지 내 실제 작동하는 MVP URL CTA 버튼 포함</span>
+        </div>
+        <div class="req-row">
+          <span class="req-dot dot-amber"></span>
+          <span class="req-text"><strong>고객 인터뷰 또는 반응 1건 이상</strong> — 실제 타깃 고객에게 보여주고 받은 피드백 인용 (익명 가능)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ── 제출물 2: PRD ── -->
+  <section class="submit-section" id="prd">
+    <div class="submit-header">
+      <span class="submit-num num-amber">제출물 2</span>
+      <h2 class="submit-title">PRD 1페이지</h2>
+    </div>
+
+    <div class="prd-doc">
+
+      <!-- 문서 헤더 -->
+      <div class="doc-header">
+        <div>
+          <div class="doc-service">[서비스명].co</div>
+          <div class="doc-title">[서비스명] — 개발 기획 PRD</div>
+          <div class="doc-meta">
+            <span class="meta-item"><strong>작성자</strong> [이름] (PO)</span>
+            <span class="meta-item"><strong>플랫폼</strong> Web / App</span>
+            <span class="meta-item"><strong>빌드</strong> 바이브코딩</span>
+          </div>
+        </div>
+        <div class="doc-badge">
+          <span class="doc-badge-num">사전교육</span>
+          <span class="doc-badge-label">PRD 1페이지</span>
+        </div>
+      </div>
+
+      <!-- 목적 요약 배너 -->
+      <div class="purpose-banner">
+        <div class="purpose-item">
+          <div class="purpose-role">👤 경영자에게</div>
+          <div class="purpose-desc">이 MVP를 통해 <strong>무엇을 검증하려는지</strong> 1~2줄로 서술. 비즈니스 가정과 연결되어야 함.</div>
+        </div>
+        <div class="purpose-item">
+          <div class="purpose-role">⚙️ 개발자에게</div>
+          <div class="purpose-desc">구현해야 할 <strong>핵심 화면과 기술 핵심</strong>을 1~2줄로 서술. 블록 1·2와 연결.</div>
+        </div>
+        <div class="purpose-item">
+          <div class="purpose-role">📣 마케터에게</div>
+          <div class="purpose-desc">사용자가 이 서비스를 통해 <strong>경험하는 핵심 가치</strong>를 1~2줄로 서술.</div>
+        </div>
+      </div>
+
+      <!-- BLOCK 1: 유저 플로우 -->
+      <div class="prd-block-new">
+        <div class="block-head">
+          <span class="block-num num-teal-new">1</span>
+          <span class="block-title-new">유저 플로우</span>
+          <span class="block-subtitle-new">— 분기 포함 전체 이동 경로</span>
+          <span class="block-tag-new tag-teal-new">화면 설계 기반</span>
+        </div>
+        <div class="block-body-new">
+          <div>
+            <div class="sub-label">요구사항</div>
+            <div class="req-row" style="margin-bottom:8px;">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>주요 사용자 여정 1~2개</strong> — 핵심 사용자 유형별로 진입부터 핵심 가치 경험까지의 화면 이동 경로를 화살표(→)로 표현</span>
+            </div>
+            <div class="req-row" style="margin-bottom:8px;">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>분기 조건 명시</strong> — 로그인/비로그인, 권한 차이 등 흐름이 갈라지는 지점을 조건 태그로 표시</span>
+            </div>
+            <div class="req-row">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>핵심 화면 강조</strong> — 핵심 가치가 전달되는 화면은 색상으로 구분해 시각적으로 드러낼 것</span>
+            </div>
+          </div>
+          <div>
+            <div class="sub-label">작성 예시 — Clora.co 기준</div>
+            <div style="margin-bottom:14px;">
+              <div class="sub-label" style="font-size:9px;margin-bottom:8px;">① 팔로워 여정 — 클론 탐색 → 채팅</div>
+              <div class="flow-diagram">
+                <div class="flow-track">
+                  <div class="flow-step"><div class="flow-box"><div class="flow-box-title">홈 피드</div><div class="flow-box-sub">클론 목록<br>검색</div></div></div>
+                  <div class="flow-conn">→</div>
+                  <div class="flow-step"><div class="flow-box"><div class="flow-box-title">클론 프로필</div><div class="flow-box-sub">소개·이력<br>추천 질문</div></div></div>
+                  <div class="flow-conn">→</div>
+                  <div class="flow-step"><div class="flow-box active"><div class="flow-box-title">채팅 시작</div><div class="flow-box-sub">비로그인<br>가능</div></div><div class="flow-cond">로그인 없이 진입 가능</div></div>
+                  <div class="flow-conn">→</div>
+                  <div class="flow-step"><div class="flow-box active"><div class="flow-box-title">대화 진행</div><div class="flow-box-sub">질문 입력<br>RAG 응답</div></div></div>
+                  <div class="flow-conn">→</div>
+                  <div class="flow-step"><div class="flow-box branch"><div class="flow-box-title">이력 저장</div><div class="flow-box-sub">로그인 시<br>세션 보존</div></div><div class="flow-cond">로그인 여부로 분기</div></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="sub-label" style="font-size:9px;margin-bottom:8px;">② 클론 마스터 여정 — 클론 생성 → 관리</div>
+              <div class="flow-diagram">
+                <div class="flow-track">
+                  <div class="flow-step"><div class="flow-box master"><div class="flow-box-title">마이페이지</div><div class="flow-box-sub">클론 없음<br>생성 CTA</div></div><div class="flow-cond">로그인 필수</div></div>
+                  <div class="flow-conn">→</div>
+                  <div class="flow-step"><div class="flow-box master"><div class="flow-box-title">클론 생성</div><div class="flow-box-sub">질문 응답<br>온보딩</div></div></div>
+                  <div class="flow-conn">→</div>
+                  <div class="flow-step"><div class="flow-box master"><div class="flow-box-title">지식 학습</div><div class="flow-box-sub">URL 입력<br>크롤링</div></div><div class="flow-cond">비동기 처리</div></div>
+                  <div class="flow-conn">→</div>
+                  <div class="flow-step"><div class="flow-box active"><div class="flow-box-title">클론 공개</div><div class="flow-box-sub">홈 피드<br>노출</div></div></div>
+                  <div class="flow-conn">→</div>
+                  <div class="flow-step"><div class="flow-box branch"><div class="flow-box-title">관리 콘솔</div><div class="flow-box-sub">답변 수정<br>파인튜닝</div></div><div class="flow-cond">MVP 다음 버전</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="val-bar val-teal-new">✦ 두 여정이 교차하는 화면이 서비스의 핵심 인터페이스 — 여정도에서 그 교차점이 보여야 함</div>
+      </div>
+
+      <!-- BLOCK 2: 화면 목록 -->
+      <div class="prd-block-new">
+        <div class="block-head">
+          <span class="block-num num-teal-new">2</span>
+          <span class="block-title-new">화면 목록</span>
+          <span class="block-subtitle-new">— 각 화면의 목적과 핵심 컴포넌트</span>
+          <span class="block-tag-new tag-teal-new">실제 서비스 화면 기준</span>
+        </div>
+        <div class="block-body-new">
+          <div>
+            <div class="sub-label">요구사항</div>
+            <div class="req-row" style="margin-bottom:8px;">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>화면 ID (S1~Sn)</strong> — 각 화면에 고유 번호를 부여해 유저 플로우(블록 1)와 연결</span>
+            </div>
+            <div class="req-row" style="margin-bottom:8px;">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>사용자 목적</strong> — "이 화면에서 사용자가 무엇을 하려는가"를 1줄 동사형 문장으로 서술</span>
+            </div>
+            <div class="req-row">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>핵심 컴포넌트</strong> — 화면을 구성하는 UI 요소를 콤마로 나열 (완전한 스펙이 아니어도 됨)</span>
+            </div>
+          </div>
+          <div>
+            <div class="sub-label">작성 예시 — Clora.co 기준</div>
+            <table class="screen-table">
+              <thead>
+                <tr><th>화면</th><th>이름</th><th>사용자 목적</th><th>핵심 컴포넌트</th><th>대상</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="it it-teal-new">S1</span></td>
+                  <td>홈 피드</td>
+                  <td>원하는 전문가를 찾고 클론 프로필로 이동한다</td>
+                  <td>검색바(이름·질문), 추천 클론 리스트(아바타·이름·직함·대표 질문 1줄)</td>
+                  <td><span class="it it-gray-new screen-who">팔로워</span></td>
+                </tr>
+                <tr>
+                  <td><span class="it it-teal-new">S2</span></td>
+                  <td>클론 프로필</td>
+                  <td>이 클론이 어떤 전문가인지 파악하고 채팅 진입을 결정한다</td>
+                  <td>프로필 사진·이름·AI 뱃지, 소개 텍스트, 경력 태그, 추천 질문 칩 3개, 채팅하기 CTA</td>
+                  <td><span class="it it-gray-new screen-who">팔로워</span></td>
+                </tr>
+                <tr>
+                  <td><span class="it it-teal-new">S3</span></td>
+                  <td>채팅</td>
+                  <td>클론에게 질문하고 전문가 관점의 답변을 받는다</td>
+                  <td>클론 인사 메시지(자동), 추천 질문 칩(초기), 메시지 버블, 텍스트 입력창, 전송 버튼</td>
+                  <td><span class="it it-gray-new screen-who">팔로워</span></td>
+                </tr>
+                <tr>
+                  <td><span class="it it-amber-new">S4</span></td>
+                  <td>마이페이지</td>
+                  <td>클론 생성으로 진입하거나 내 클론을 관리한다</td>
+                  <td>클론 미생성: 생성 CTA / 생성 후: 내 클론 링크, 계정 정보, 로그아웃</td>
+                  <td><span class="it it-amber-new screen-who">마스터</span></td>
+                </tr>
+                <tr>
+                  <td><span class="it it-amber-new">S5</span></td>
+                  <td>클론 생성</td>
+                  <td>질문에 답하는 방식으로 내 AI 클론의 기초 지식을 구성한다</td>
+                  <td>단계별 온보딩 질문, 전문 분야·이력 입력, 콘텐츠 URL 연결, 추천 질문 설정</td>
+                  <td><span class="it it-amber-new screen-who">마스터</span></td>
+                </tr>
+                <tr>
+                  <td><span class="it it-blue-new">S6</span></td>
+                  <td>관리 콘솔</td>
+                  <td>팔로워 질문에 대한 클론 답변을 검토하고 품질을 개선한다</td>
+                  <td>질문 목록, 미응답 모아보기, 답변 수정 인터페이스 <span class="it it-red-new">MVP 다음 버전</span></td>
+                  <td><span class="it it-blue-new screen-who">마스터</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="val-bar val-teal-new">✦ 화면 ID가 블록 1 유저 플로우의 화면과 일치해야 함 — S번호로 두 블록이 연결됨</div>
+      </div>
+
+      <!-- BLOCK 3: MVP 범위 -->
+      <div class="prd-block-new">
+        <div class="block-head">
+          <span class="block-num num-amber-new">3</span>
+          <span class="block-title-new">MVP 범위</span>
+          <span class="block-subtitle-new">— 판단 기준 포함</span>
+          <span class="block-tag-new tag-amber-new">→ MVP URL 연결</span>
+        </div>
+        <div class="block-body-new">
+          <div>
+            <div class="sub-label">요구사항</div>
+            <div class="req-row" style="margin-bottom:8px;">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>In (MVP 구현)</strong> — 이번 MVP에서 반드시 작동해야 하는 기능과 화면, 각 항목마다 "왜 In인가"의 판단 근거 1줄</span>
+            </div>
+            <div class="req-row" style="margin-bottom:8px;">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>Out (다음 버전)</strong> — 의도적으로 제외한 기능과 그 이유. "가정 검증 후" 조건을 명시할 것</span>
+            </div>
+            <div class="req-row">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>MVP 완료 판단 기준</strong> — 외부인이 URL 하나로 접속해 설명서 없이 핵심 가치를 경험할 수 있는 조건을 1~2줄로 명시</span>
+            </div>
+          </div>
+          <div>
+            <div class="sub-label">작성 예시 — Clora.co 기준</div>
+            <div class="inout-grid-new">
+              <div class="inout-box">
+                <div class="inout-head-new in-head-new">✓ In — MVP 구현 (검증에 필요한 최소)</div>
+                <div class="inout-body-new">
+                  <div class="inout-item-new"><span class="in-dot">●</span><div><strong>홈 피드 + 검색</strong><div class="inout-reason">팔로워가 클론을 발견하는 첫 접점</div></div></div>
+                  <div class="inout-item-new"><span class="in-dot">●</span><div><strong>클론 프로필 + 채팅 (비로그인·RAG)</strong><div class="inout-reason">핵심 가치 전달 — 없으면 검증 불가</div></div></div>
+                  <div class="inout-item-new"><span class="in-dot">●</span><div><strong>클론 생성 온보딩 + URL 학습</strong><div class="inout-reason">마스터 없이는 클론이 없음</div></div></div>
+                  <div class="inout-item-new"><span class="in-dot">●</span><div><strong>로그인/로그아웃 + 테마</strong><div class="inout-reason">이미 구현됨</div></div></div>
+                </div>
+              </div>
+              <div class="inout-box">
+                <div class="inout-head-new out-head-new">✕ Out — 다음 버전 (가정 검증 후)</div>
+                <div class="inout-body-new">
+                  <div class="inout-item-new"><span class="out-dot">○</span><div><strong>관리 콘솔 (답변 수정·파인튜닝)</strong><div class="inout-reason">마스터 유료 전환 의향 확인 후 추가</div></div></div>
+                  <div class="inout-item-new"><span class="out-dot">○</span><div><strong>음성 학습 + 멤버십 그룹</strong><div class="inout-reason">수익 모델 확정 후 개발</div></div></div>
+                  <div class="inout-item-new"><span class="out-dot">○</span><div><strong>웹훅·외부 툴 연동</strong><div class="inout-reason">코어 검증 이후</div></div></div>
+                  <div class="inout-item-new"><span class="out-dot">○</span><div><strong>클론 통계 대시보드</strong><div class="inout-reason">데이터 쌓인 후 의미 있음</div></div></div>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);padding:12px 16px;background:#FAFAF8;border:1px solid var(--border);border-radius:8px;margin-top:10px;">
+              <strong>MVP 완료 판단 기준</strong> — 팔로워가 URL 하나로 진입해 30초 내에 클론과 채팅할 수 있고, 클론 마스터가 URL 3개 입력만으로 자신의 클론을 만들 수 있으면 MVP 완성.
+            </div>
+          </div>
+        </div>
+        <div class="val-bar val-amber-new">✦ In/Out은 기능 우선순위가 아니라 <strong>검증 순서</strong>의 문제 — Out 항목에는 반드시 "가정 검증 후" 조건을 명시할 것</div>
+      </div>
+
+      <!-- BLOCK 4: 핵심 가정 -->
+      <div class="prd-block-new">
+        <div class="block-head">
+          <span class="block-num num-amber-new">4</span>
+          <span class="block-title-new">핵심 가정 & 검증 방법</span>
+          <span class="block-subtitle-new">— 비즈니스 가정 / 기술 가정 구분</span>
+          <span class="block-tag-new tag-amber-new">방법론 핵심</span>
+        </div>
+        <div class="block-body-new">
+          <div>
+            <div class="sub-label">요구사항</div>
+            <div class="req-row" style="margin-bottom:8px;">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>가정 1~2개</strong> — "이게 틀리면 이 프로덕트는 의미없다"는 전제. 비즈니스 가정(수익·고객행동)과 기술 가정(구현가능성·품질)을 구분해 작성</span>
+            </div>
+            <div class="req-row" style="margin-bottom:8px;">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>검증 방법</strong> — MVP를 통해 이 가정을 어떻게 확인할 것인지 (인터뷰·테스트·데이터 기준)</span>
+            </div>
+            <div class="req-row">
+              <span class="req-dot dot-amber"></span>
+              <span class="req-text"><strong>성공 지표</strong> — "이 수치가 나오면 가정이 맞다"는 구체적 숫자 또는 조건</span>
+            </div>
+          </div>
+          <div>
+            <div class="sub-label">작성 예시 — Clora.co 기준</div>
+            <div class="assumption-card">
+              <div class="assumption-head-new ah-biz">
+                <div class="assumption-num an-biz">A</div>
+                <div class="assumption-title">클론 마스터는 팔로워 인게이지먼트를 위해 기꺼이 비용을 낼 것이다</div>
+                <span class="it it-amber-new assumption-type">비즈니스 가정</span>
+              </div>
+              <div class="assumption-body-new">
+                <div>
+                  <div class="abox-label">가정 내용</div>
+                  <div class="abox-val">인플루언서·코치·컨설턴트는 팔로워 응대와 유료 전환에 돈을 쓴다. <strong>사용자 과금이 아닌 클론 마스터 과금</strong>이 수익 모델이 된다.</div>
+                </div>
+                <div>
+                  <div class="abox-label">검증 방법</div>
+                  <div class="abox-val">무료 클론 마스터 30명 운영 → 유료 전환 의향 인터뷰. 컨설팅 퍼널 연결 사례 수집.</div>
+                </div>
+                <div>
+                  <div class="abox-label">성공 지표</div>
+                  <div class="abox-val">유료 전환 의향 <strong>20% 이상</strong> / 유료 컨설팅 연결 <strong>월 3건 이상</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="assumption-card">
+              <div class="assumption-head-new ah-tech">
+                <div class="assumption-num an-tech">B</div>
+                <div class="assumption-title">RAG 응답이 "이 전문가의 답변"처럼 느껴질 만큼 차별화된다</div>
+                <span class="it it-purple-new assumption-type">기술 가정</span>
+              </div>
+              <div class="assumption-body-new">
+                <div>
+                  <div class="abox-label">가정 내용</div>
+                  <div class="abox-val">전문가 콘텐츠 기반 RAG가 <strong>범용 LLM과 구분될 만큼</strong> 해당 전문가의 어조·관점을 반영해야 한다.</div>
+                </div>
+                <div>
+                  <div class="abox-label">검증 방법</div>
+                  <div class="abox-val">동일 질문 → 클론 vs ChatGPT 블라인드 테스트. 5인 사용자 비교 평가.</div>
+                </div>
+                <div>
+                  <div class="abox-label">성공 지표</div>
+                  <div class="abox-val">블라인드 테스트 <strong>5인 중 4인 이상</strong> 클론 선택 / 재방문율 <strong>50% 이상</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="val-bar val-amber-new">✦ 이 항목이 없으면 "제품을 만든 것"이지 "창업 가설을 검증한 것"이 아님 — <strong>필수</strong></div>
+      </div>
+
+      <!-- 문서 푸터 -->
+      <div class="doc-footer">
+        <div class="footer-left">
+          <strong>[서비스명]</strong> · 개발 기획 PRD<br>
+          <span style="font-size:10px;">AI 솔로프러너 육성 프로그램 · 사전교육</span>
+        </div>
+      </div>
+
+    </div><!-- /.prd-doc -->
+
+    <hr class="divider" style="margin: 28px 0 20px;">
+
+    <div class="sec-label">PRD 형식 기준</div>
+    <div class="format-grid">
+      <div class="format-card">
+        <div class="format-title">분량</div>
+        <div class="format-body">A4 1장 또는 노션·슬라이드 1페이지 — 4개 블록이 한눈에 들어오면 충분</div>
+      </div>
+      <div class="format-card">
+        <div class="format-title">제출 형식</div>
+        <div class="format-body">PDF 또는 공개 URL (노션, 구글독스 등). 평가자가 별도 계정 없이 열람 가능해야 함</div>
+      </div>
+      <div class="format-card">
+        <div class="format-title">작성 순서 권장</div>
+        <div class="format-body">유저 플로우 → 화면 목록 → MVP 범위 → 핵심 가정 순으로 작성 후 바이브코딩 시작</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ── 제출물 3: MVP URL ── -->
+  <section class="submit-section" id="mvp">
+    <div class="submit-header">
+      <span class="submit-num num-teal">제출물 3</span>
+      <h2 class="submit-title">MVP IT 솔루션 (바이브코딩) URL</h2>
+    </div>
+
+    <div class="req-card">
+      <div class="req-card-head">① 작동 요건 — 실제로 작동해야 하는 핵심 기능</div>
+      <div class="req-card-body">
+        <div class="req-row">
+          <span class="req-dot dot-teal"></span>
+          <span class="req-text"><strong>핵심 기능 1개 완성</strong> — 랜딩페이지에서 정의한 Pain을 해결하는 기능이 외부인도 URL만으로 실행 가능해야 함</span>
+        </div>
+        <div class="req-row">
+          <span class="req-dot dot-teal"></span>
+          <span class="req-text"><strong>회원가입 없이 체험 가능한 데모 플로우</strong> — 로그인 없이도 핵심 가치를 30초 내에 경험할 수 있어야 함</span>
+        </div>
+        <div class="req-row">
+          <span class="req-dot dot-teal"></span>
+          <span class="req-text"><strong>모바일 접근 가능</strong> — 스마트폰 브라우저에서 주요 기능이 깨지지 않아야 함</span>
+        </div>
+        <div class="example">검증 기준 — <span>평가자가 URL을 열었을 때 설명서 없이 핵심 기능을 사용해볼 수 있는가?</span></div>
+      </div>
+    </div>
+
+    <div class="req-card">
+      <div class="req-card-head">② 방법론 연결 — MVP가 PRD 정의와 일치하는가</div>
+      <div class="req-card-body">
+        <div class="req-row">
+          <span class="req-dot dot-teal"></span>
+          <span class="req-text"><strong>랜딩페이지의 핵심 기능 정의와 MVP 구현이 일치</strong> — "설명한 기능"이 실제로 작동해야 함 (범위 불일치 시 이유 서술)</span>
+        </div>
+        <div class="req-row">
+          <span class="req-dot dot-teal"></span>
+          <span class="req-text"><strong>타깃 고객이 사용자로 상정된 UX</strong> — 인터페이스의 언어·용어·플로우가 정의한 페르소나 기준으로 설계됐는지</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 탈락 기준 -->
+  <div class="sec-label">탈락 기준</div>
+  <div class="caution">
+    <strong>다음에 해당하면 재제출 요청</strong>
+    랜딩페이지·PRD·MVP 세 산출물 간 타깃 고객 또는 핵심 기능이 서로 달라 "같은 프로덕트"로 읽히지 않는 경우 / 핵심 가정 항목 누락 / MVP URL이 평가자 접근 시 작동하지 않는 경우
+  </div>
+
+</main>
+
+</body>
+</html>

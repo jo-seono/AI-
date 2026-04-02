@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clora PRD — AI 클론 메신저 개발 기획</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #F6F4EF;
+    --paper:     #FFFFFF;
+    --surface:   #FAFAF8;
+    --border:    #E2DDD4;
+    --border2:   #C8C0B0;
+    --text:      #1A1714;
+    --text2:     #5A524A;
+    --text3:     #9A9080;
+    --amber:     #B87A10;
+    --amber-bg:  #FDF3DC;
+    --amber-bd:  #F0C060;
+    --teal:      #0A6B52;
+    --teal-bg:   #E0F5EC;
+    --teal-bd:   #60C8A0;
+    --purple:    #4A38A8;
+    --purple-bg: #EEEAFC;
+    --purple-bd: #A090E0;
+    --blue:      #1A5CA8;
+    --blue-bg:   #E8F0FC;
+    --blue-bd:   #90B0E0;
+    --red:       #A82020;
+    --red-bg:    #FCEAEA;
+    --red-bd:    #F0A0A0;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Noto Sans KR', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+
+  /* ── 상단 바 ── */
+  .top-bar { background: var(--text); color: #F6F4EF; padding: 10px 0; text-align: center; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; }
+  .top-bar span { color: var(--amber-bd); margin: 0 6px; }
+
+  .page-wrap { max-width: 900px; margin: 36px auto 80px; padding: 0 24px; }
+
+  /* 제출물 흐름 */
+  .flow-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+  .flow-chip { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 99px; font-family: var(--mono); white-space: nowrap; }
+  .chip-done { background: #E8F4E8; color: #2A6A2A; border: 1px solid #A0CCA0; }
+  .chip-now  { background: var(--amber-bg); color: var(--amber); border: 2px solid var(--amber-bd); }
+  .chip-next { background: var(--bg); color: var(--text3); border: 1px solid var(--border2); }
+  .chip-arrow { color: var(--border2); font-size: 14px; }
+
+  /* ── 문서 카드 ── */
+  .prd-doc { background: var(--paper); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+
+  /* 헤더 */
+  .doc-header { padding: 28px 40px 24px; border-bottom: 2px solid var(--text); display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; }
+  .doc-service { font-family: var(--mono); font-size: 20px; font-weight: 500; color: var(--amber); letter-spacing: 0.06em; margin-bottom: 4px; }
+  .doc-title { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; margin-bottom: 10px; }
+  .doc-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .meta-item { font-size: 11px; font-family: var(--mono); color: var(--text3); }
+  .meta-item strong { color: var(--text2); }
+  .doc-badge { background: var(--amber-bg); border: 1px solid var(--amber-bd); border-radius: 8px; padding: 10px 16px; text-align: center; flex-shrink: 0; }
+  .doc-badge-num { font-family: var(--mono); font-size: 10px; color: var(--amber); letter-spacing: 0.1em; display: block; margin-bottom: 2px; }
+  .doc-badge-label { font-size: 12px; font-weight: 700; color: var(--amber); }
+
+  /* 목적 요약 배너 */
+  .purpose-banner { padding: 16px 40px; background: var(--amber-bg); border-bottom: 1px solid var(--amber-bd); display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .purpose-item { padding: 0 20px; border-right: 1px solid var(--amber-bd); }
+  .purpose-item:first-child { padding-left: 0; }
+  .purpose-item:last-child { border-right: none; }
+  .purpose-role { font-family: var(--mono); font-size: 10px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .purpose-desc { font-size: 12px; color: #7A5000; line-height: 1.5; }
+
+  /* 블록 */
+  .prd-block { border-bottom: 1px solid var(--border); }
+  .prd-block:last-child { border-bottom: none; }
+  .block-head { display: flex; align-items: center; gap: 10px; padding: 13px 40px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .block-num { width: 24px; height: 24px; border-radius: 50%; font-family: var(--mono); font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .num-amber  { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-bd); }
+  .num-teal   { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-bd); }
+  .num-blue   { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-bd); }
+  .num-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-bd); }
+  .block-title { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; }
+  .block-subtitle { font-size: 12px; color: var(--text3); margin-left: 4px; }
+  .block-tag { font-size: 10px; font-family: var(--mono); padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+  .tag-amber  { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-bd); }
+  .tag-teal   { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-bd); }
+  .tag-blue   { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-bd); }
+  .tag-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-bd); }
+
+  .block-body { padding: 24px 40px; display: flex; flex-direction: column; gap: 22px; }
+
+  /* 섹션 내 소제목 */
+  .sub-label { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+  /* 필드 */
+  .field-row { display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: start; }
+  .field-label { font-size: 11px; font-weight: 500; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; }
+  .field-value { font-size: 13px; color: var(--text2); line-height: 1.65; }
+  .field-value strong { color: var(--text); font-weight: 700; }
+  .field-divider { height: 1px; background: var(--border); margin: 2px 0; }
+
+  /* 인라인 태그 */
+  .it { display: inline-block; font-size: 10px; font-family: var(--mono); padding: 1px 6px; border-radius: 3px; margin: 1px 3px 1px 0; vertical-align: middle; }
+  .it-amber  { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-bd); }
+  .it-teal   { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-bd); }
+  .it-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-bd); }
+  .it-blue   { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-bd); }
+  .it-gray   { background: #F0EDE8; color: var(--text3); border: 1px solid var(--border2); }
+  .it-red    { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-bd); }
+  .it-green  { background: #E8F4E8; color: #2A6A2A; border: 1px solid #A0CCA0; }
+
+  /* ── 유저 플로우 다이어그램 ── */
+  .flow-diagram { overflow-x: auto; padding-bottom: 8px; }
+  .flow-track { display: flex; align-items: flex-start; gap: 0; min-width: max-content; }
+  .flow-step { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .flow-box {
+    border: 1.5px solid var(--border2); border-radius: 8px;
+    padding: 10px 14px; min-width: 100px; max-width: 120px;
+    text-align: center; background: var(--paper);
+  }
+  .flow-box.active  { border-color: var(--teal-bd);   background: var(--teal-bg); }
+  .flow-box.master  { border-color: var(--amber-bd);  background: var(--amber-bg); }
+  .flow-box.branch  { border-color: var(--blue-bd);   background: var(--blue-bg); }
+  .flow-box-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .flow-box.active  .flow-box-title { color: var(--teal); }
+  .flow-box.master  .flow-box-title { color: var(--amber); }
+  .flow-box.branch  .flow-box-title { color: var(--blue); }
+  .flow-box-sub { font-size: 10px; color: var(--text3); font-family: var(--mono); line-height: 1.4; }
+  .flow-conn { display: flex; align-items: center; padding: 0 4px; margin-top: 20px; color: var(--text3); font-size: 14px; flex-shrink: 0; }
+  .flow-cond { font-size: 9px; font-family: var(--mono); color: var(--blue); background: var(--blue-bg); border: 1px solid var(--blue-bd); padding: 2px 6px; border-radius: 3px; margin-top: 6px; white-space: nowrap; }
+
+  /* ── 화면-기능 테이블 ── */
+  .screen-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .screen-table th { background: #F0EDE8; padding: 7px 14px; text-align: left; font-weight: 700; font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); border-bottom: 1px solid var(--border2); }
+  .screen-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text2); line-height: 1.5; vertical-align: top; }
+  .screen-table tr:last-child td { border-bottom: none; }
+  .screen-table tr:hover td { background: #FAFAF8; }
+  .screen-table td:first-child { white-space: nowrap; }
+  .screen-table td:nth-child(2) { font-weight: 500; color: var(--text); }
+  .screen-who { font-size: 10px; font-family: var(--mono); }
+
+  /* ── 데이터 플로우 (핵심 개선) ── */
+  .data-flow { display: flex; flex-direction: column; gap: 0; }
+  .df-row { display: flex; align-items: stretch; gap: 0; }
+  .df-phase {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px; flex: 1;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .df-phase-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .df-phase-desc  { font-size: 11px; color: var(--text2); line-height: 1.55; }
+  .df-phase-tech  { font-size: 10px; font-family: var(--mono); color: var(--purple); margin-top: 4px; }
+  .df-arrow { display: flex; align-items: center; padding: 0 10px; color: var(--text3); font-size: 18px; flex-shrink: 0; }
+  .df-connector { display: flex; justify-content: center; padding: 4px 0; color: var(--text3); font-size: 14px; }
+
+  /* ERD */
+  .erd-section { display: flex; flex-direction: column; gap: 12px; }
+  .erd-row { display: flex; align-items: stretch; gap: 0; overflow-x: auto; }
+  .entity { border: 1.5px solid var(--border2); border-radius: 8px; overflow: hidden; min-width: 148px; flex: 1; background: var(--paper); }
+  .entity-head { padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; font-family: var(--mono); }
+  .entity-head.user   { background: var(--blue-bg);   color: var(--blue);   border-color: var(--blue-bd); }
+  .entity-head.clone  { background: var(--teal-bg);   color: var(--teal);   border-color: var(--teal-bd); }
+  .entity-head.know   { background: var(--purple-bg); color: var(--purple); border-color: var(--purple-bd); }
+  .entity-head.sess   { background: var(--amber-bg);  color: var(--amber);  border-color: var(--amber-bd); }
+  .entity-head.msg    { background: #F0EDE8; color: var(--text2); }
+  .entity-body { padding: 8px 12px; display: flex; flex-direction: column; gap: 3px; }
+  .ef { display: flex; align-items: center; gap: 5px; font-size: 11px; font-family: var(--mono); color: var(--text2); padding: 2px 0; border-bottom: 1px solid var(--border); }
+  .ef:last-child { border-bottom: none; }
+  .ef-note { font-size: 9px; color: var(--text3); margin-left: auto; }
+  .ef-badge { font-size: 9px; padding: 1px 4px; border-radius: 2px; font-weight: 500; white-space: nowrap; }
+  .pk { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-bd); }
+  .fk { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-bd); }
+  .rel-wrap { display: flex; align-items: center; padding: 0 8px; flex-shrink: 0; flex-direction: column; gap: 3px; }
+  .rel-line { width: 1px; flex: 1; background: var(--border2); min-height: 20px; }
+  .rel-label { font-size: 10px; font-family: var(--mono); color: var(--text3); white-space: nowrap; padding: 2px 5px; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; }
+
+  /* 설계 결정 카드 */
+  .decision-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .decision-card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .decision-head { padding: 8px 14px; font-size: 11px; font-weight: 700; border-bottom: 1px solid var(--border); background: var(--surface); color: var(--text2); }
+  .decision-body { padding: 10px 14px; font-size: 12px; color: var(--text2); line-height: 1.55; }
+  .decision-body strong { color: var(--text); font-weight: 700; display: block; margin-bottom: 3px; }
+  .decision-warn { font-size: 11px; color: var(--red); margin-top: 6px; font-family: var(--mono); }
+
+  /* API 테이블 */
+  .api-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .api-table th { background: #F0EDE8; padding: 7px 12px; text-align: left; font-weight: 700; font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); border-bottom: 1px solid var(--border2); }
+  .api-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text2); line-height: 1.5; vertical-align: top; font-size: 12px; }
+  .api-table tr:last-child td { border-bottom: none; }
+  .api-table tr.priority td { background: #FAFDF8; }
+  .api-table td:first-child { font-family: var(--mono); font-size: 11px; color: var(--blue); white-space: nowrap; }
+  .method { display: inline-block; font-family: var(--mono); font-size: 10px; padding: 1px 5px; border-radius: 2px; margin-right: 4px; font-weight: 500; }
+  .get    { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-bd); }
+  .post   { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-bd); }
+  .put    { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-bd); }
+
+  /* In/Out */
+  .inout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .inout-box { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .inout-head { padding: 7px 14px; font-size: 11px; font-weight: 700; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--border); }
+  .in-head  { background: var(--teal-bg);  color: var(--teal); }
+  .out-head { background: #F5F0E8; color: var(--text3); }
+  .inout-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
+  .inout-item { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .in-dot  { color: var(--teal); font-size: 10px; margin-top: 3px; flex-shrink: 0; }
+  .out-dot { color: var(--text3); font-size: 10px; margin-top: 3px; flex-shrink: 0; }
+  .inout-reason { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-left: 16px; }
+
+  /* 가정 카드 */
+  .assumption-card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+  .assumption-card:last-child { margin-bottom: 0; }
+  .assumption-head { display: flex; align-items: center; gap: 10px; padding: 9px 16px; border-bottom: 1px solid var(--border); }
+  .ah-biz  { background: var(--amber-bg); border-color: var(--amber-bd); }
+  .ah-tech { background: var(--purple-bg); border-color: var(--purple-bd); }
+  .assumption-num { width: 20px; height: 20px; border-radius: 50%; font-family: var(--mono); font-size: 10px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .an-biz  { background: var(--amber); color: white; }
+  .an-tech { background: var(--purple); color: white; }
+  .assumption-title { font-size: 12px; font-weight: 700; color: var(--text); flex: 1; }
+  .assumption-type { font-size: 10px; font-family: var(--mono); }
+  .assumption-body { padding: 12px 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .abox-label { font-family: var(--mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .abox-val { font-size: 12px; color: var(--text2); line-height: 1.55; }
+  .abox-val strong { color: var(--text); font-weight: 500; }
+
+  /* 검증 바 */
+  .val-bar { padding: 10px 40px; font-size: 12px; line-height: 1.5; border-top: 1px solid var(--border); }
+  .val-amber  { background: var(--amber-bg);  color: #7A5000; }
+  .val-teal   { background: var(--teal-bg);   color: #0A4A3A; }
+  .val-blue   { background: var(--blue-bg);   color: #0A3A6A; }
+  .val-purple { background: var(--purple-bg); color: #2A1870; }
+
+  /* 문서 푸터 */
+  .doc-footer { padding: 14px 40px; border-top: 2px solid var(--text); background: var(--surface); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .footer-left { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+  .footer-left strong { color: var(--amber); }
+  .format-tag { font-size: 11px; font-family: var(--mono); padding: 3px 10px; border-radius: 3px; background: var(--bg); color: var(--text3); border: 1px solid var(--border2); }
+
+  /* 가이드 패널 */
+  .guide-panel { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); width: 200px; background: var(--paper); border: 1px solid var(--amber-bd); border-radius: 12px; padding: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 50; }
+  .guide-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); margin-bottom: 10px; }
+  .guide-section { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin: 9px 0 5px; }
+  .guide-item { display: flex; align-items: flex-start; gap: 6px; font-size: 11px; color: var(--text2); line-height: 1.5; margin-bottom: 5px; }
+  .g-dot { color: var(--amber); font-size: 9px; margin-top: 3px; flex-shrink: 0; }
+  .guide-note { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 10px; color: var(--text3); line-height: 1.5; }
+
+  @media (max-width: 960px) { .guide-panel { display: none; } }
+  @media (max-width: 680px) {
+    .doc-header, .purpose-banner { grid-template-columns: 1fr; }
+    .purpose-item { padding: 8px 0; border-right: none; border-bottom: 1px solid var(--amber-bd); }
+    .purpose-item:last-child { border-bottom: none; }
+    .block-head, .block-body, .val-bar, .doc-footer { padding-left: 20px; padding-right: 20px; }
+    .field-row { grid-template-columns: 1fr; gap: 4px; }
+    .decision-grid, .inout-grid { grid-template-columns: 1fr; }
+    .assumption-body { grid-template-columns: 1fr; }
+    .erd-row { flex-direction: column; }
+    .rel-wrap { flex-direction: row; width: 100%; height: 24px; }
+    .rel-line { width: 100%; height: 1px; flex: 1; }
+    .df-row { flex-direction: column; }
+    .df-arrow { transform: rotate(90deg); padding: 4px 0; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  AI 솔로프러너 육성 프로그램 · 사전교육
+
+  Clora.co PRD — AI 클론 메신저 개발 기획
+</div>
+
+<aside class="guide-panel">
+  <div class="guide-title">📋 PRD 작성 기준</div>
+  <div class="guide-section">블록 구성</div>
+  <div class="guide-item"><span class="g-dot">●</span><span>1. 유저 플로우 — 팔로워/마스터 여정</span></div>
+  <div class="guide-item"><span class="g-dot">●</span><span>2. 화면 목록 — 목적 + 컴포넌트</span></div>
+  <div class="guide-item"><span class="g-dot">●</span><span>3. MVP 범위 — In/Out + 판단 근거</span></div>
+  <div class="guide-item"><span class="g-dot">●</span><span>4. 핵심 가정 — 비즈니스 / 기술</span></div>
+  <div class="guide-section">독자별 핵심</div>
+  <div class="guide-item"><span class="g-dot">●</span><span>경영자 — 목적 배너 + 블록 3·4</span></div>
+  <div class="guide-item"><span class="g-dot">●</span><span>개발자 — 블록 1·2</span></div>
+  <div class="guide-item"><span class="g-dot">●</span><span>마케터 — 블록 2 화면 목적</span></div>
+  <div class="guide-note">✦ PRD는 랜딩(왜)과 MVP(무엇을) 사이의 다리입니다.</div>
+</aside>
+
+<div class="page-wrap">
+  <div class="flow-nav">
+    <span class="flow-chip chip-done">✓ 제출물 1 · 랜딩페이지</span>
+    <span class="chip-arrow">→</span>
+    <span class="flow-chip chip-now">▶ 제출물 2 · PRD 1페이지</span>
+    <span class="chip-arrow">→</span>
+    <span class="flow-chip chip-next">제출물 3 · MVP URL</span>
+  </div>
+
+  <div class="prd-doc">
+
+    <!-- 헤더 -->
+    <div class="doc-header">
+      <div>
+        <div class="doc-service">Clora.co</div>
+        <div class="doc-title">AI 클론 메신저 — 개발 기획 PRD</div>
+        <div class="doc-meta">
+          <span class="meta-item"><strong>작성자</strong> 송하윤 (PO)</span>
+          <span class="meta-item"><strong>플랫폼</strong> Web (모바일 대응)</span>
+          <span class="meta-item"><strong>빌드</strong> 바이브코딩</span>
+        </div>
+      </div>
+      <div class="doc-badge">
+        <span class="doc-badge-num">사전교육</span>
+        <span class="doc-badge-label">PRD 1페이지</span>
+      </div>
+    </div>
+
+    <!-- 목적 요약 배너: 3종 독자용 1줄 요약 -->
+    <div class="purpose-banner">
+      <div class="purpose-item">
+        <div class="purpose-role">👤 경영자에게</div>
+        <div class="purpose-desc">전문가 클론이 팔로워와 24시간 채팅하는 MVP를 만들어, <strong>"클론 마스터가 과금할 의향이 있는가"</strong>를 검증한다.</div>
+      </div>
+      <div class="purpose-item">
+        <div class="purpose-role">⚙️ 개발자에게</div>
+        <div class="purpose-desc">클론 프로필·채팅·생성 3개 핵심 화면을 구현하고, <strong>RAG 파이프라인(지식 임베딩 → 벡터 검색 → LLM 응답)</strong>을 MVP의 기술 핵심으로 완성한다.</div>
+      </div>
+      <div class="purpose-item">
+        <div class="purpose-role">📣 마케터에게</div>
+        <div class="purpose-desc">팔로워가 특정 전문가 클론과 채팅하는 경험을 통해 <strong>"이 전문가의 생각을 직접 듣는 것"</strong>을 가치로 전달한다.</div>
+      </div>
+    </div>
+
+    <!-- ━━━━━━ BLOCK 1: 유저 플로우 ━━━━━━ -->
+    <div class="prd-block">
+      <div class="block-head">
+        <span class="block-num num-teal">1</span>
+        <span class="block-title">유저 플로우</span>
+        <span class="block-subtitle">— 분기 포함 전체 이동 경로</span>
+        <span class="block-tag tag-teal">화면 설계 기반</span>
+      </div>
+      <div class="block-body">
+
+        <div>
+          <div class="sub-label">① 팔로워 여정 — 클론 탐색 → 채팅</div>
+          <div class="flow-diagram">
+            <div class="flow-track">
+              <div class="flow-step">
+                <div class="flow-box">
+                  <div class="flow-box-title">홈 피드</div>
+                  <div class="flow-box-sub">클론 목록<br>검색</div>
+                </div>
+              </div>
+              <div class="flow-conn">→</div>
+              <div class="flow-step">
+                <div class="flow-box">
+                  <div class="flow-box-title">클론 프로필</div>
+                  <div class="flow-box-sub">소개·이력<br>추천 질문</div>
+                </div>
+              </div>
+              <div class="flow-conn">→</div>
+              <div class="flow-step">
+                <div class="flow-box active">
+                  <div class="flow-box-title">채팅 시작</div>
+                  <div class="flow-box-sub">비로그인<br>가능</div>
+                </div>
+                <div class="flow-cond">로그인 없이 진입 가능</div>
+              </div>
+              <div class="flow-conn">→</div>
+              <div class="flow-step">
+                <div class="flow-box active">
+                  <div class="flow-box-title">대화 진행</div>
+                  <div class="flow-box-sub">질문 입력<br>RAG 응답</div>
+                </div>
+              </div>
+              <div class="flow-conn">→</div>
+              <div class="flow-step">
+                <div class="flow-box branch">
+                  <div class="flow-box-title">이력 저장</div>
+                  <div class="flow-box-sub">로그인 시<br>세션 보존</div>
+                </div>
+                <div class="flow-cond">로그인 여부로 분기</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="sub-label">② 클론 마스터 여정 — 클론 생성 → 관리</div>
+          <div class="flow-diagram">
+            <div class="flow-track">
+              <div class="flow-step">
+                <div class="flow-box master">
+                  <div class="flow-box-title">마이페이지</div>
+                  <div class="flow-box-sub">클론 없음<br>생성 CTA</div>
+                </div>
+                <div class="flow-cond">로그인 필수</div>
+              </div>
+              <div class="flow-conn">→</div>
+              <div class="flow-step">
+                <div class="flow-box master">
+                  <div class="flow-box-title">클론 생성</div>
+                  <div class="flow-box-sub">질문 응답<br>온보딩</div>
+                </div>
+              </div>
+              <div class="flow-conn">→</div>
+              <div class="flow-step">
+                <div class="flow-box master">
+                  <div class="flow-box-title">지식 학습</div>
+                  <div class="flow-box-sub">URL 입력<br>크롤링</div>
+                </div>
+                <div class="flow-cond">비동기 처리</div>
+              </div>
+              <div class="flow-conn">→</div>
+              <div class="flow-step">
+                <div class="flow-box active">
+                  <div class="flow-box-title">클론 공개</div>
+                  <div class="flow-box-sub">홈 피드<br>노출</div>
+                </div>
+              </div>
+              <div class="flow-conn">→</div>
+              <div class="flow-step">
+                <div class="flow-box branch">
+                  <div class="flow-box-title">관리 콘솔</div>
+                  <div class="flow-box-sub">답변 수정<br>파인튜닝</div>
+                </div>
+                <div class="flow-cond">MVP 다음 버전</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="val-bar val-teal">✦ 두 여정이 <strong>클론 프로필</strong>에서 교차 — 팔로워는 소비(채팅), 마스터는 생산(생성·관리). 이 교차점이 서비스의 핵심 인터페이스</div>
+    </div>
+
+    <!-- ━━━━━━ BLOCK 2: 화면 목록 ━━━━━━ -->
+    <div class="prd-block">
+      <div class="block-head">
+        <span class="block-num num-teal">2</span>
+        <span class="block-title">화면 목록</span>
+        <span class="block-subtitle">— 각 화면의 목적과 핵심 컴포넌트</span>
+        <span class="block-tag tag-teal">실제 서비스 화면 기준</span>
+      </div>
+      <div class="block-body">
+        <table class="screen-table">
+          <thead>
+            <tr>
+              <th>화면</th>
+              <th>이름</th>
+              <th>사용자 목적</th>
+              <th>핵심 컴포넌트</th>
+              <th>대상</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="it it-teal">S1</span></td>
+              <td>홈 피드</td>
+              <td>원하는 전문가를 찾고 클론 프로필로 이동한다</td>
+              <td>검색바(이름·질문), 추천 클론 리스트(아바타·이름·직함·대표 질문 1줄)</td>
+              <td><span class="it it-gray screen-who">팔로워</span></td>
+            </tr>
+            <tr>
+              <td><span class="it it-teal">S2</span></td>
+              <td>클론 프로필</td>
+              <td>이 클론이 어떤 전문가인지 파악하고 채팅 진입을 결정한다</td>
+              <td>프로필 사진·이름·AI 뱃지, 소개 텍스트, 경력 태그, 외부 링크 뱃지, 추천 질문 칩 3개, 채팅하기 CTA</td>
+              <td><span class="it it-gray screen-who">팔로워</span></td>
+            </tr>
+            <tr>
+              <td><span class="it it-teal">S3</span></td>
+              <td>채팅</td>
+              <td>클론에게 질문하고 전문가의 관점이 담긴 답변을 받는다</td>
+              <td>클론 인사 메시지(자동), 추천 질문 칩(초기), 메시지 버블(user/clone), 텍스트 입력창, 파일 첨부, 전송 버튼</td>
+              <td><span class="it it-gray screen-who">팔로워</span></td>
+            </tr>
+            <tr>
+              <td><span class="it it-amber">S4</span></td>
+              <td>마이페이지</td>
+              <td>클론 생성으로 진입하거나 내 클론을 관리한다</td>
+              <td>클론 미생성 상태: 생성 CTA / 생성 후: 내 클론 링크, 계정 정보, 로그아웃</td>
+              <td><span class="it it-amber screen-who">마스터</span></td>
+            </tr>
+            <tr>
+              <td><span class="it it-amber">S5</span></td>
+              <td>클론 생성</td>
+              <td>질문에 답하는 방식으로 내 AI 클론의 기초 지식을 구성한다</td>
+              <td>단계별 온보딩 질문, 전문 분야·이력 입력, 콘텐츠 URL 연결, 추천 질문 설정, 프로필 이미지 업로드</td>
+              <td><span class="it it-amber screen-who">마스터</span></td>
+            </tr>
+            <tr>
+              <td><span class="it it-blue">S6</span></td>
+              <td>관리 콘솔</td>
+              <td>팔로워 질문에 대한 클론 답변을 검토하고 품질을 개선한다</td>
+              <td>질문 목록, 미응답 모아보기, 답변 수정 인터페이스, 지식 추가/수정 <span class="it it-red">MVP 다음 버전</span></td>
+              <td><span class="it it-blue screen-who">마스터</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="val-bar val-teal">✦ S1~S3(팔로워·읽기)과 S4~S5(마스터·쓰기)를 MVP 우선 완성. S6(관리 콘솔)은 가정 검증 후 추가</div>
+    </div>
+
+    <!-- ━━━━━━ BLOCK 3: MVP 범위 ━━━━━━ -->
+    <div class="prd-block">
+      <div class="block-head">
+        <span class="block-num num-amber">3</span>
+        <span class="block-title">MVP 범위</span>
+        <span class="block-subtitle">— 판단 기준 포함</span>
+        <span class="block-tag tag-amber">→ MVP URL 연결</span>
+      </div>
+      <div class="block-body">
+        <div class="inout-grid">
+          <div class="inout-box">
+            <div class="inout-head in-head">✓ In — MVP 구현 (검증에 필요한 최소)</div>
+            <div class="inout-body">
+              <div class="inout-item"><span class="in-dot">●</span><div><strong>홈 피드 + 검색</strong><div class="inout-reason">팔로워가 클론을 발견하는 첫 접점</div></div></div>
+              <div class="inout-item"><span class="in-dot">●</span><div><strong>클론 프로필 페이지</strong><div class="inout-reason">채팅 진입 전 신뢰 형성 화면</div></div></div>
+              <div class="inout-item"><span class="in-dot">●</span><div><strong>채팅 (비로그인 포함 · RAG 응답)</strong><div class="inout-reason">핵심 가치 전달 — 없으면 검증 불가</div></div></div>
+              <div class="inout-item"><span class="in-dot">●</span><div><strong>클론 생성 온보딩 + URL 학습</strong><div class="inout-reason">마스터 없이는 클론이 없음</div></div></div>
+              <div class="inout-item"><span class="in-dot">●</span><div><strong>로그인/로그아웃 + 다크·라이트 테마</strong><div class="inout-reason">실제 서비스에서 이미 구현됨</div></div></div>
+            </div>
+          </div>
+          <div class="inout-box">
+            <div class="inout-head out-head">✕ Out — 다음 버전 (가정 검증 후)</div>
+            <div class="inout-body">
+              <div class="inout-item"><span class="out-dot">○</span><div><strong>관리 콘솔 (답변 수정·파인튜닝)</strong><div class="inout-reason">마스터 유료 전환 의향 확인 후 추가</div></div></div>
+              <div class="inout-item"><span class="out-dot">○</span><div><strong>음성 학습 (30초 녹음)</strong><div class="inout-reason">차별화 기능이나 MVP 검증에 불필요</div></div></div>
+              <div class="inout-item"><span class="out-dot">○</span><div><strong>멤버십 그룹 + 결제 연동</strong><div class="inout-reason">수익 모델 확정 후 개발</div></div></div>
+              <div class="inout-item"><span class="out-dot">○</span><div><strong>웹훅·외부 툴 연동</strong><div class="inout-reason">워크플로 자동화는 코어 검증 이후</div></div></div>
+              <div class="inout-item"><span class="out-dot">○</span><div><strong>클론 통계 대시보드</strong><div class="inout-reason">데이터 쌓인 후 의미 있음</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+          <strong>MVP 완료 판단 기준</strong> — 팔로워가 URL 하나로 진입해서 설명서 없이 30초 내에 클론과 채팅할 수 있고, 클론 마스터가 URL 3개 입력만으로 자신의 클론을 만들 수 있으면 MVP 완성.
+        </div>
+      </div>
+      <div class="val-bar val-amber">✦ Out 항목 모두 "가정 검증 후"라는 명시적 조건이 붙음 — In/Out은 기능 우선순위가 아니라 <strong>검증 순서</strong>의 문제</div>
+    </div>
+
+    <!-- ━━━━━━ BLOCK 4: 핵심 가정 ━━━━━━ -->
+    <div class="prd-block">
+      <div class="block-head">
+        <span class="block-num num-amber">4</span>
+        <span class="block-title">핵심 가정 & 검증 방법</span>
+        <span class="block-subtitle">— 비즈니스 가정 / 기술 가정 구분</span>
+        <span class="block-tag tag-amber">방법론 핵심</span>
+      </div>
+      <div class="block-body">
+
+        <div class="assumption-card">
+          <div class="assumption-head ah-biz">
+            <div class="assumption-num an-biz">A</div>
+            <div class="assumption-title">클론 마스터는 팔로워 인게이지먼트를 위해 기꺼이 비용을 낼 것이다</div>
+            <span class="it it-amber assumption-type">비즈니스 가정</span>
+          </div>
+          <div class="assumption-body">
+            <div>
+              <div class="abox-label">가정 내용</div>
+              <div class="abox-val">인플루언서·코치·컨설턴트는 팔로워 응대와 유료 전환에 돈을 쓴다. 클로라 클론이 그 역할을 하면, <strong>사용자 과금이 아닌 클론 마스터 과금</strong>이 수익 모델이 된다.</div>
+            </div>
+            <div>
+              <div class="abox-label">검증 방법</div>
+              <div class="abox-val">무료 클론 마스터 30명 운영 → 유료 전환 의향 인터뷰. 컨설팅 퍼널 연결 사례 수집 (클론 상담 → 유료 1:1 전환).</div>
+            </div>
+            <div>
+              <div class="abox-label">성공 지표</div>
+              <div class="abox-val">유료 전환 의향 <strong>20% 이상</strong> / 클론을 통한 유료 컨설팅 연결 <strong>월 3건 이상</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="assumption-card">
+          <div class="assumption-head ah-tech">
+            <div class="assumption-num an-tech">B</div>
+            <div class="assumption-title">RAG 응답이 "이 전문가의 답변"처럼 느껴질 만큼 차별화된다</div>
+            <span class="it it-purple assumption-type">기술 가정</span>
+          </div>
+          <div class="assumption-body">
+            <div>
+              <div class="abox-label">가정 내용</div>
+              <div class="abox-val">전문가 콘텐츠 기반 RAG가 <strong>범용 LLM과 구분될 만큼</strong> 해당 전문가의 어조·관점을 반영해야 한다. 그렇지 않으면 재방문이 없다.</div>
+            </div>
+            <div>
+              <div class="abox-label">검증 방법</div>
+              <div class="abox-val">동일 질문 → 클론 vs ChatGPT 블라인드 테스트. 5인 사용자가 어느 쪽이 더 "해당 전문가답다"고 느끼는지 비교.</div>
+            </div>
+            <div>
+              <div class="abox-label">성공 지표</div>
+              <div class="abox-val">블라인드 테스트 <strong>5인 중 4인 이상</strong> 클론 선택 / 채팅 재방문율 <strong>50% 이상</strong></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="val-bar val-amber">✦ 가정 A(비즈니스)는 MVP 배포 후 2주 내 인터뷰로 검증. 가정 B(기술)는 배포 전 내부 테스트로 먼저 확인 — <strong>B 미통과 시 배포 보류</strong></div>
+    </div>
+
+    <!-- 푸터 -->
+    <div class="doc-footer">
+      <div class="footer-left">
+        <strong>Clora.co</strong> · AI 클론 메신저 개발 기획 PRD<br>
+        <span style="font-size:10px;">AI 솔로프러너 육성 프로그램 · 사전교육</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
